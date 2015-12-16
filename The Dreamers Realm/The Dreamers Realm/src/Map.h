@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Terrain.h"
+#include "TownGenerator.h"
 
 class Map
 {
@@ -10,15 +11,13 @@ public:
 
 	void initMap(int wSize, int hSize);
 	void generateMap();
-	std::vector<std::vector<std::vector<int*> > > * getMapTextures();
-	int getZLevels();
 	int getHSize();
 	int getWSize();
+	std::string getTerrainType(int x, int y);
 
 private:
 	int wSize;
 	int hSize;
-	std::vector<std::vector<Terrain> > map;
-	std::vector<std::vector<std::vector<int*> > > textures;
+	TownGenerator town;
 };
 

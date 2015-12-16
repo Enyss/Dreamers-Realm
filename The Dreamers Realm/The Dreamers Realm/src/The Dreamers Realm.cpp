@@ -3,7 +3,8 @@
 
 #include "stdafx.h"
 #include "Map.h"
-#include "FieldRenderer.h"
+#include "Renderer.h"
+#include "TownGenerator.h"
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
@@ -14,6 +15,7 @@ bool init()
 {
 	//Initialization flag
 	bool success = true;
+	srand(time(NULL));
 
 	//Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -55,7 +57,7 @@ bool init()
 
 int main(int argc, char* args[])
 {
-	FieldRenderer fieldRenderer;
+	Renderer renderer;
 	Map map;
 	if (!init())
 	{
@@ -64,15 +66,17 @@ int main(int argc, char* args[])
 	else
 	{
 		//Load media
-		if (!fieldRenderer.init(gWindow))
+		if (!renderer.init(gWindow))
 		{
 			printf("Failed to load media!\n");
 		}
 		else
 		{
-			
-			fieldRenderer.loadSpriteSheet("gfx/spriteSheet.png");
-			map.initMap(100, 100);
+			int xPos = 0;
+			int yPos = 0;
+			double zoom = 0.25;
+			renderer.loadSpriteSheet("gfx/spriteSheet.png");
+			map.initMap(80, 60);
 			map.generateMap();
 
 			//Main loop flag
@@ -92,8 +96,41 @@ int main(int argc, char* args[])
 					{
 						quit = true;
 					}
+					const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL); 
+					if (currentKeyStates[SDL_SCANCODE_UP])
+					{
+						yPos--;
+						std::cout << xPos << "," << yPos << std::endl;
+					}
+					else if (currentKeyStates[SDL_SCANCODE_DOWN]) 
+					{ 
+						yPos++;
+						std::cout << xPos << "," << yPos << std::endl;
+					}
+					else if (currentKeyStates[SDL_SCANCODE_LEFT])
+					{
+						xPos--;
+						std::cout << xPos << "," << yPos << std::endl;
+					}
+					else if (currentKeyStates[SDL_SCANCODE_RIGHT])
+					{ 
+						xPos++;
+						std::cout << xPos << "," << yPos << std::endl;
+					}
+					else if (currentKeyStates[SDL_SCANCODE_KP_PLUS])
+					{
+						zoom = zoom*2;
+						std::cout << zoom << std::endl;
+					}
+					else if (currentKeyStates[SDL_SCANCODE_KP_MINUS])
+					{
+						zoom = zoom/2;
+						std::cout << zoom << std::endl;
+					}
 				}
-				fieldRenderer.render(&map);
+				renderer.setZoom(zoom);
+				renderer.setCenter(xPos, yPos);
+				renderer.render(map);
 			}
 		}
 	}

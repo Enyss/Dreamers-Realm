@@ -4,7 +4,6 @@
 
 Terrain::Terrain()
 {
-	textures.assign(NB_ZLEVEL, 0);
 }
 
 
@@ -12,12 +11,12 @@ Terrain::~Terrain()
 {
 }
 
-void Terrain::addTexture(int zLevel, int texture)
+void Terrain::addType(std::string typeTerrain)
 {
-	textures[zLevel] = texture;
+	this->typeTerrain = typeTerrain;
 }
 
-int * Terrain::getTextureId(int zLevel)
+std::string Terrain::getType()
 {
-	return &(textures[zLevel]);
+	return this->typeTerrain;
 }

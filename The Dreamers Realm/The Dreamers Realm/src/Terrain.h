@@ -7,10 +7,10 @@ class Terrain
 public:
 	Terrain();
 	~Terrain();
-	void addTexture(int zLevel, int texture);
-	int * getTextureId(int zLevel);
+	void addType(std::string typeTerrain);
+	std::string getType();
 
 private:
-	std::vector<int> textures;
+	std::string typeTerrain;
 };
 

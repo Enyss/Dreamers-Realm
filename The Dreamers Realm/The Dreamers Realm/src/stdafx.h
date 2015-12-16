@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <tchar.h>
+#include <ctime>
 #include <vector>
 #include <SDL.h>
 #include <SDL_image.h>
