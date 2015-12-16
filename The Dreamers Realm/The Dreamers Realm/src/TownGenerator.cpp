@@ -1,8 +1,5 @@
 #include "TownGenerator.h"
 
-#define WALKABLE 0x1
-#define T_ROAD 0x10 + WALKABLE
-#define T_WALL 0x20
 
 TownGenerator::TownGenerator()
 {
@@ -13,29 +10,17 @@ TownGenerator::~TownGenerator()
 {
 }
 
-void TownGenerator::generate(int x, int y)
+void TownGenerator::generate(Map * map)
 {
 	// Parameters
 	int wRoad = 3;
 	int density = 25;
 	int spacing = 7;
 	//
-	wSize = x;
-	hSize = y;
-	g.randomGraph( density, x/spacing, y/spacing);
+	wSize = map->getWSize();
+	hSize = map->getHSize();
+	g.randomGraph( density, wSize/spacing, hSize/spacing);
 	g.makeSparsePlanar(5);
-
-	map.resize(wSize);
-	for (int i = 0; i < wSize; i++)
-	{
-		map[i].assign(hSize,NULL);
-		for (int j = 0; j < hSize; j++)
-		{
-				map[i][j] = new Terrain();
-				map[i][j]->addType("void");
-		}
-	}
-
 
 
 	// Faire Les routes
@@ -61,7 +46,7 @@ void TownGenerator::generate(int x, int y)
 				{
 					if (0 <= i && i < wSize && 0 <= j && j < hSize)
 					{
-						map[i][j]->addType("city_road");
+						map->setTerrainType(i,j,"city_road");
 					}
 				}				
 			}
@@ -71,7 +56,7 @@ void TownGenerator::generate(int x, int y)
 				{
 					if (0 <= i && i < wSize && 0 <= j && j < hSize)
 					{
-						map[i][j]->addType("city_road");
+						map->setTerrainType(i, j, "city_road");
 					}
 				}
 			}
@@ -85,7 +70,7 @@ void TownGenerator::generate(int x, int y)
 				{
 					if (0 <= i && i < wSize && 0 <= j && j < hSize)
 					{
-						map[i][j]->addType("city_road");
+						map->setTerrainType(i, j, "city_road");
 					}
 				}
 			}
@@ -95,34 +80,98 @@ void TownGenerator::generate(int x, int y)
 				{
 					if (0 <= i && i < wSize && 0 <= j && j < hSize)
 					{
-						map[i][j]->addType("city_road");
+						map->setTerrainType(i, j, "city_road");
 					}
 				}
 			}
 		}
 	}
-	// Faire les murs
+	// Placer des maisons
+	for (int i = 0; i < wSize / spacing; i++)
+	{
+		for (int j = 0; j < hSize / spacing; j++)
+		{
+			// placer un batiment
+			if (rand() % 3 !=0 && map->getTerrainType(i*spacing,j*spacing)=="void" )
+			{
+				//generer taille maxi
+				int xStart = i*spacing;
+				int yStart = j*spacing;
+				while (map->getTerrainType(xStart-1, yStart-1) == "void" && xStart > 0 && yStart > 0) 
+				{
+					xStart--;
+					yStart--;
+				}
+
+				int xEnd = xStart + spacing*(rand() % 3 + 1);
+				int yEnd = yStart + spacing*(rand() % 3 + 1);
+
+				//sol temporaire
+				for (int x = xStart; x <= xEnd; x++ )
+				{
+					if (map->getTerrainType(x,yStart) == "void")
+					{
+						for (int y = yStart; y <= yEnd; y++)
+						{
+							if (map->getTerrainType(x, y) == "void")
+							{
+								map->setTerrainType(x, y, "temp_building_current");
+							}
+							else
+							{
+								break;
+							}
+						}
+					}
+					else
+					{
+						break;
+					}
+				}
+				//murs temporaires
+				for (int x = xStart; x <= xEnd; x++)
+				{
+					for (int y = yStart; y <= yEnd; y++)
+					{
+						if (map->getTerrainType(x, y) == "temp_building_current")
+						{
+							std::multiset<std::string> neighborTerrain = map->neighborTerrainType(x,y);
+							if (neighborTerrain.count("temp_building_current") + neighborTerrain.count("temp_wall_current") < 8)
+							{
+								map->setTerrainType(x, y, "temp_wall_current");
+							}
+						}
+					}
+				}
+
+				//modifier les types temporaires en types corrects 
+				for (int x = xStart; x <= xEnd; x++)
+				{
+					for (int y = yStart; y <= yEnd; y++)
+					{
+						if (map->getTerrainType(x, y) == "temp_building_current")
+						{
+							map->setTerrainType(x, y, "city_floor");
+						}
+						else if (map->getTerrainType(x, y) == "temp_wall_current")
+						{
+							map->setTerrainType(x, y, "city_wall");
+						}
+					}
+				}
+			}
+		}
+	}
+	//remplir le reste d'herbe
 	for (int x = 0; x < wSize; x++)
 	{
 		for (int y = 0; y < hSize; y++)
 		{
-			if ( map[x][y]->getType() == "void" )
+			if (map->getTerrainType(x, y) == "void")
 			{
-				bool result = false;
-				for (int i = x - 1; i <= x + 1 && !result; i++)
-				{
-					for (int j = y - 1; j <= y + 1 && !result; j++)
-					{
-						result = ( i >= 0 && i < wSize && j >= 0 && j < hSize && map[i][j]->getType() == "city_road");
-					}
-				}
-				if(result)
-				{
-					map[x][y]->addType("city_wall");
-				}
+				map->setTerrainType(x,y,"city_grass");
 			}
 		}
 	}
-
 }
 

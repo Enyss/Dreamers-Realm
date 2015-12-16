@@ -59,6 +59,7 @@ int main(int argc, char* args[])
 {
 	Renderer renderer;
 	Map map;
+	TownGenerator townGenerator;
 	if (!init())
 	{
 		printf("Failed to initialize!\n");
@@ -77,7 +78,7 @@ int main(int argc, char* args[])
 			double zoom = 0.25;
 			renderer.loadSpriteSheet("gfx/spriteSheet.png");
 			map.initMap(80, 60);
-			map.generateMap();
+			townGenerator.generate(&map);
 
 			//Main loop flag
 			bool quit = false;

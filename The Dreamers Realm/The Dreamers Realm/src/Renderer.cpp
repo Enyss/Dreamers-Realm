@@ -72,15 +72,30 @@ void Renderer::render(Map & map)
 				xSprite = 0;
 				ySprite = 0;
 			}
-			if (map.getTerrainType(x,y) == "city_road") 
+			else if (map.getTerrainType(x,y) == "city_road") 
 			{
 				xSprite = 7;
 				ySprite = 15;
+			}
+			else if (map.getTerrainType(x, y) == "city_floor")
+			{
+				xSprite = 18;
+				ySprite = 14;
 			}
 			else if (map.getTerrainType(x, y) == "city_wall")
 			{
 				xSprite = 8;
 				ySprite = 16;
+			}
+			else if (map.getTerrainType(x, y) == "city_grass")
+			{
+				xSprite = 0;
+				ySprite = 15;
+			}
+			else
+			{
+				xSprite = 1;
+				ySprite = 1;
 			}
 			SDL_Rect clip = { xSprite*SPRITE_SIZE, ySprite*SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE };
 			
